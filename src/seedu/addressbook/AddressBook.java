@@ -11,19 +11,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.String;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.Iterator;
+import java.util.*;
 
 /*
  * NOTE : =============================================================
@@ -134,6 +127,10 @@ public class AddressBook {
     private static final String COMMAND_EXIT_WORD = "exit";
     private static final String COMMAND_EXIT_DESC = "Exits the program.";
     private static final String COMMAND_EXIT_EXAMPLE = COMMAND_EXIT_WORD;
+
+    private static final String COMMAND_SORT_WORD = "sort";
+    private static final String COMMAND_SORT_DESC = "Lists all persons in alphabetical order.";
+    private static final String COMMAND_SORT_EXAMPLE = COMMAND_SORT_WORD;
 
     private static final String DIVIDER = "===================================================";
 
@@ -381,6 +378,8 @@ public class AddressBook {
             return executeDeletePerson(commandArgs);
         case COMMAND_CLEAR_WORD:
             return executeClearAddressBook();
+        case COMMAND_SORT_WORD:
+            return executeSortAllPersonsInAddressBook();
         case COMMAND_HELP_WORD:
             return getUsageInfoForAllCommands();
         case COMMAND_EXIT_WORD:
@@ -456,6 +455,24 @@ public class AddressBook {
         final ArrayList<String[]> personsFound = getPersonsWithNameContainingAnyKeyword(keywords);
         showToUser(personsFound);
         return getMessageForPersonsDisplayedSummary(personsFound);
+    }
+
+    private static String executeSortAllPersonsInAddressBook() {
+        ArrayList<String[]> unsortedPersons = getAllPersonsInAddressBook();
+        ArrayList<String[]> sortedPersons = sortAllPersons(unsortedPersons);
+
+        showToUser(sortedPersons);
+        return getMessageForPersonsDisplayedSummary(sortedPersons);
+    }
+
+
+    /**
+     *
+     */
+    private static ArrayList<String[]> sortAllPersons(ArrayList<String[]> unsortedPersons) {
+        ArrayList<String[]> sortedPersons = (ArrayList<String[]>) unsortedPersons.clone();
+        sortedPersons.sort(new ComparatorToSort());
+        return sortedPersons;
     }
 
     /**
@@ -1185,4 +1202,12 @@ public class AddressBook {
         return new ArrayList<>(Arrays.asList(toSplit.trim().split("\\s+")));
     }
 
+}
+
+class ComparatorToSort implements Comparator<String[]> {
+    private static final int INDEX_OF_NAME= 0;
+    @Override
+    public int compare(String[] stringArr1, String[] stringArr2) {
+        return stringArr1[INDEX_OF_NAME].compareTo(stringArr2[INDEX_OF_NAME]);
+    }
 }
