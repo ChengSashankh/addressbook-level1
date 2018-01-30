@@ -10,6 +10,7 @@ package seedu.addressbook;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.String;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Iterator;
 
 /*
  * NOTE : =============================================================
@@ -483,9 +485,10 @@ public class AddressBook {
      * @return list of persons in full model with name containing some of the keywords
      */
     private static ArrayList<String[]> getPersonsWithNameContainingAnyKeyword(Collection<String> keywords) {
+        keywords = convertKeywordsToUpperCase(keywords);
         final ArrayList<String[]> matchedPersons = new ArrayList<>();
         for (String[] person : getAllPersonsInAddressBook()) {
-            final Set<String> wordsInName = new HashSet<>(splitByWhitespace(getNameFromPerson(person)));
+            final Set<String> wordsInName = new HashSet<>(splitByWhitespace(getNameFromPerson(person).toUpperCase()));
             if (!Collections.disjoint(wordsInName, keywords)) {
                 matchedPersons.add(person);
             }
@@ -511,6 +514,24 @@ public class AddressBook {
         return deletePersonFromAddressBook(targetInModel) ? getMessageForSuccessfulDelete(targetInModel) // success
                                                           : MESSAGE_PERSON_NOT_IN_ADDRESSBOOK; // not found
     }
+
+    /**
+     * Converts a keywords to be searched into upper case.
+     *
+     * @param keywords collection of keywords entered by user for find operation
+     * @return the set of keywords capitalised
+     */
+    private static Collection<String> convertKeywordsToUpperCase(Collection<String> keywords) {
+       Collection<String> keywordsInUpperCase = new HashSet<>();
+       Iterator<String> iterator = keywords.iterator();
+
+       while(iterator.hasNext()){
+            String element = iterator.next();
+            keywordsInUpperCase.add(element.toUpperCase());
+        }
+        return keywordsInUpperCase;
+    }
+
 
     /**
      * Checks validity of delete person argument string's format.
